@@ -1,0 +1,297 @@
+<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>نظام تسجيل إنزال الأسماك</title>
+<style>
+.official-head{display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid #183044;padding-bottom:12px;margin-bottom:18px}.official-head .logo-box{width:78px;height:78px;border:2px solid #183044;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:12px;text-align:center}.official-head .titles{text-align:center;flex:1}.official-head h1{font-size:22px;margin:3px}.official-head p{margin:4px}.report-tools{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:15px}.footer-sign{display:flex;justify-content:space-between;margin-top:70px;border-top:1px solid #aaa;padding-top:20px}.small{font-size:12px;color:#667}
+body{font-family:Arial;background:#f4f7fa;margin:0;color:#183044}.wrap{max-width:1150px;margin:auto;padding:20px}.card{background:white;border-radius:14px;padding:18px;margin:14px 0;box-shadow:0 2px 10px #0001}h1,h2{margin-top:0}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}input,select,textarea,button{padding:10px;border:1px solid #ccd6df;border-radius:8px;font-size:15px}button{background:#0d5c75;color:white;cursor:pointer}.secondary{background:#667788}.danger{background:#a33}.row{display:flex;gap:8px;align-items:center;margin:7px 0}.row input{flex:1}table{width:100%;border-collapse:collapse}th,td{border-bottom:1px solid #e4e8eb;padding:9px;text-align:right}.hidden{display:none}.pill{padding:5px 9px;border-radius:20px;background:#e8f2f5}.actions{display:flex;gap:8px;flex-wrap:wrap}.report{font-size:18px}.print{display:none}@media print{.no-print{display:none!important}.print{display:block}}
+</style><link rel="manifest" href="/manifest.webmanifest"><meta name="theme-color" content="#183044"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="إنزال الأسماك"><link rel="apple-touch-icon" href="/static/apple-touch-icon.png">
+</head><body>
+<div style="text-align:center;padding:8px;font-size:12px;opacity:.7;">النظام المركزي – نسخة جاهزة للنشر | الإصدار 12.0</div><div class="wrap">
+<div id="login" class="card"><h1>نظام تسجيل إنزال الأسماك في الدقم</h1><div class="small">الإصدار 7.0 – المحاضر والتقارير الرسمية</div><p>الوسطى – ميناء الصيد البحري | وحدة التفتيش</p><div class="grid"><input id="lu" placeholder="اسم المستخدم"><input id="lp" type="password" placeholder="كلمة المرور"></div><br><button onclick="login()">دخول</button></div>
+<div id="app" class="hidden">
+<div class="card no-print"><div class="actions"><button onclick="show('home')">الرئيسية</button><button onclick="show('new')">تسجيل إنزال جديد</button><button onclick="show('records')">السجلات والمحاضر</button><button onclick="show('reports')">التقارير</button><button id="shipsBtn" onclick="show('ships')" class="hidden">بيانات السفن</button><button id="adminBtn" onclick="show('admin')" class="hidden">إدارة الموظفين</button><button class="secondary" onclick="location.reload()">خروج</button></div></div>
+<section id="home"><div class="card"><h2>لوحة المتابعة</h2><div id="stats" class="grid"></div></div></section>
+<section id="new" class="hidden no-print"><div class="card"><h2>محضر إنزال أسماك</h2><div class="grid">
+<input id="date" type="date"><input id="time" type="time"><input id="ship" placeholder="اسم السفينة"><input id="shipno" placeholder="رقم السفينة"><input id="trip" placeholder="رقم الرحلة"><input id="catch" placeholder="نوع المصيد"><input id="qty" type="number" step="0.01" placeholder="إجمالي الكمية (كجم)">
+</div><h3>أنواع الأسماك</h3><div id="fish"></div><button class="secondary" onclick="fishRow()">+ إضافة نوع سمك</button>
+<h3>المفتشون</h3><div id="insp"></div><button class="secondary" onclick="inspRow()">+ إضافة مفتش</button>
+<h3>ملاحظات</h3><textarea id="notes" style="width:100%;box-sizing:border-box" rows="3"></textarea><h3>مرفقات المحضر</h3><input id="files" type="file" multiple accept=".jpg,.jpeg,.png,.pdf"><br><br><button onclick="saveLanding()">حفظ المحضر</button><span id="saveMsg"></span></div></section>
+<section id="records" class="hidden"><div class="card"><h2>السجلات والمحاضر</h2><div class="grid no-print"><input id="q" placeholder="بحث برقم الإنزال أو السفينة"><input id="from" type="date"><input id="to" type="date"><button onclick="loadRecords()">بحث</button></div><div id="recordsBox"></div></div></section>
+<section id="reports" class="hidden"><div class="card">
+<div class="official-head"><div class="logo-box">شعار<br>الجهة</div><div class="titles"><h1>سلطنة عُمان</h1><p>الوسطى – ميناء الصيد البحري</p><p><b>وحدة التفتيش</b></p></div><div class="logo-box">نظام<br>الإنزال</div></div>
+<h2>التقارير والإحصائيات</h2>
+<div class="report-tools no-print"><input id="rf" type="date"><input id="rt" type="date"><input id="rs" placeholder="نوع السمك"><button onclick="loadReport()">تطبيق الفلتر</button><button class="secondary" onclick="window.print()">طباعة التقرير</button></div>
+<div id="reportBox"></div>
+<div class="footer-sign"><span>إعداد المفتش: __________________</span><span>اعتماد المسؤول: __________________</span></div>
+<p class="small">هذا التقرير مستخرج من نظام تسجيل إنزال الأسماك في الدقم.</p>
+</div></section>
+<section id="ships" class="hidden no-print"><div class="card"><h2>بيانات السفن</h2><p class="small">قاعدة بيانات السفن تساعد على توحيد بيانات السفينة عند تسجيل الإنزال.</p><div class="grid"><input id="sn" placeholder="رقم السفينة"><input id="sname" placeholder="اسم السفينة"><input id="owner" placeholder="اسم المالك"><input id="license" placeholder="رقم الترخيص"><input id="snotes" placeholder="ملاحظات"><button onclick="addShip()">+ إضافة سفينة</button></div><br><div id="shipsBox"></div></div></section><section id="admin" class="hidden no-print"><div class="card"><h2>إدارة الموظفين</h2><p class="small">من هنا يستطيع المدير إضافة الموظفين، ويمكن الاحتفاظ بنسخة احتياطية من بيانات النظام.</p><div class="grid"><input id="nu" placeholder="اسم المستخدم"><input id="np" type="password" placeholder="كلمة المرور (6 أحرف على الأقل)"><select id="nr"><option value="inspector">مفتش</option><option value="viewer">مشاهد</option><option value="admin">مدير</option></select><button onclick="addUser()">+ إضافة موظف</button></div><br><div id="users"></div><div class="card"><h3>النسخ الاحتياطي</h3><p class="small">يمكن للمدير تنزيل نسخة احتياطية من قاعدة البيانات لحفظها في مكان آمن.</p><button onclick="backup()">⬇️ تنزيل نسخة احتياطية</button></div></div></section>
+</div></div>
+<script>
+let user=null, lastLanding=null;
+function login(){fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:lu.value,password:lp.value})}).then(r=>r.json()).then(x=>{if(!x.ok)return alert(x.error);user=x.user;sessionStorage.u=user.username;login.style.display='none';app.classList.remove('hidden');if(user.role==='admin'){adminBtn.classList.remove('hidden');shipsBtn.classList.remove('hidden');}show('home');loadHome()})}
+function H(url,opt={}){opt.headers=Object.assign({'X-User':user.username},opt.headers||{});return fetch(url,opt)}
+function show(id){['home','new','records','reports','ships','admin'].forEach(x=>document.getElementById(x).classList.toggle('hidden',x!==id));if(id==='records')loadRecords();if(id==='reports')loadReport();if(id==='admin')loadUsers(); loadDelegationPanel(); loadAuditLogs(); loadAdminSummary(); loadAccountManagement();if(id==='ships')loadShips()}
+function fishRow(n='',q=''){let d=document.createElement('div');d.className='row';d.innerHTML=`<input placeholder="نوع السمك" value="${n}"><input type="number" step="0.01" placeholder="الكمية كجم" value="${q}"><button class="danger" onclick="this.parentNode.remove()">حذف</button>`;fish.appendChild(d)}
+function inspRow(n=''){let d=document.createElement('div');d.className='row';d.innerHTML=`<input placeholder="اسم المفتش" value="${n}"><button class="danger" onclick="this.parentNode.remove()">حذف</button>`;insp.appendChild(d)}
+fishRow();inspRow();
+function saveLanding(){let fs=[...document.querySelectorAll('#fish .row')].map(r=>({fish_name:r.children[0].value,quantity:r.children[1].value})).filter(x=>x.fish_name);let ins=[...document.querySelectorAll('#insp .row input')].map(x=>x.value).filter(Boolean);let d={landing_date:date.value,landing_time:time.value,ship_name:ship.value,ship_no:shipno.value,trip_no:trip.value,catch_type:catch.value,total_qty:qty.value,notes:notes.value,fish:fs,inspectors:ins};H('/api/landings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)}).then(r=>r.json()).then(async x=>{if(!x.ok)return alert(x.error);lastLanding=x;let f=files.files;if(f.length){let fd=new FormData();[...f].forEach(z=>fd.append('files',z));await H('/api/landings/'+x.id+'/attachments',{method:'POST',body:fd})}saveMsg.innerHTML=' — تم حفظ المحضر رقم '+x.landing_no;loadHome();loadRecords()})}
+function loadHome(){H('/api/report').then(r=>r.json()).then(x=>stats.innerHTML=`<div class="card report">عدد المحاضر: <b>${x.count}</b></div><div class="card report">إجمالي الكمية: <b>${x.total_qty.toFixed(2)} كجم</b></div><div class="card report">عدد أنواع الأسماك: <b>${Object.keys(x.species).length}</b></div>`)}
+function loadRecords(){let p=new URLSearchParams({q:q.value,from:from.value,to:to.value});H('/api/landings?'+p).then(r=>r.json()).then(rows=>{let h='<table><tr><th>الرقم</th><th>التاريخ</th><th>السفينة</th><th>الكمية</th><th>المفتشون</th><th>المرفقات</th><th>الحالة</th><th>المحضر</th></tr>';rows.forEach(x=>{let a=x.attachments.map(z=>`<a href="/uploads/${z.filename}" target="_blank">${z.original_name}</a>`).join('، '); let st=`<select onchange="setStatus(${x.id},this.value)"><option ${x.status==='مسودة'?'selected':''}>مسودة</option><option ${x.status==='مراجعة'?'selected':''}>مراجعة</option><option ${x.status==='معتمد'?'selected':''}>معتمد</option></select>`;h+=`<tr><td>${x.landing_no}</td><td>${x.landing_date||''}</td><td>${x.ship_name||''}</td><td>${x.total_qty||0}</td><td>${x.inspectors.join('، ')}</td><td>${a}</td><td>${st}</td><td><button onclick='printLanding(${JSON.stringify(x)})'>طباعة</button><button onclick='pdfLanding(${JSON.stringify(x)})'>PDF</button>${user.role==='admin'?`<button class="danger" onclick="deleteLanding(${x.id})">حذف</button>`:''}</td></tr>`});recordsBox.innerHTML=h+'</table>'})}
+function pdfLanding(x){window.open('/api/landings/'+x.id+'/pdf','_blank')}
+function printLanding(x){let w=window.open('','_blank');w.document.write(`<html dir="rtl"><head><title>محضر ${x.landing_no}</title><style>body{font-family:Arial;padding:35px}table{width:100%;border-collapse:collapse}td,th{border:1px solid #777;padding:10px}.sign{margin-top:80px;display:flex;justify-content:space-between}</style></head><body><h2 style="text-align:center">سلطنة عُمان</h2><h3 style="text-align:center">الوسطى – ميناء الصيد البحري</h3><p style="text-align:center"><b>وحدة التفتيش</b></p><h1 style="text-align:center">محضر تسجيل إنزال الأسماك</h1><p><b>رقم المحضر:</b> ${x.landing_no} &nbsp; <b>التاريخ:</b> ${x.landing_date||''} &nbsp; <b>الوقت:</b> ${x.landing_time||''}</p><table><tr><th>اسم السفينة</th><td>${x.ship_name||''}</td><th>رقم السفينة</th><td>${x.ship_no||''}</td></tr><tr><th>رقم الرحلة</th><td>${x.trip_no||''}</td><th>نوع المصيد</th><td>${x.catch_type||''}</td></tr><tr><th>إجمالي الكمية</th><td colspan="3">${x.total_qty||0} كجم</td></tr></table><h3>تفاصيل الأسماك</h3><table><tr><th>النوع</th><th>الكمية (كجم)</th></tr>${x.fish.map(f=>`<tr><td>${f.fish_name}</td><td>${f.quantity}</td></tr>`).join('')}</table><h3>المفتشون</h3><p>${x.inspectors.join('، ')}</p><h3>الاعتمادات الإلكترونية</h3><p>${(x.signatures||[]).map(z=>z.inspector_name+" – "+z.signed_at).join("<br>")}</p><h3>الملاحظات</h3><p>${x.notes||''}</p><div class="sign"><span>توقيع المفتش: __________</span><span>توقيع المسؤول: __________</span></div><script>window.print()<\/script>
+<section id="delegationPanel" class="card" style="margin-top:18px;">
+  <h2>تفويض صلاحية المدير للمفتشين</h2>
+  <p>يمكن للمدير اختيار مفتش ليحل محله خلال فترة الراحة أو الغياب. عند انتهاء الوقت تعود صلاحية المفتش تلقائياً إلى صلاحية مفتش.</p>
+  <div class="grid">
+    <label>المفتش
+      <select id="delegateUser"></select>
+    </label>
+    <label>بداية التفويض
+      <input id="delegateStart" type="datetime-local">
+    </label>
+    <label>نهاية التفويض
+      <input id="delegateEnd" type="datetime-local">
+    </label>
+  </div>
+  <button onclick="addDelegation()">تفويض الصلاحية</button>
+  <div id="delegationMsg"></div>
+  <div style="overflow:auto;margin-top:12px;">
+    <table>
+      <thead><tr><th>المفتش</th><th>من</th><th>إلى</th><th>الحالة</th><th>إجراء</th></tr></thead>
+      <tbody id="delegationRows"></tbody>
+    </table>
+  </div>
+</section>
+
+
+<section id="auditPanel" class="card" style="margin-top:18px;">
+  <h2>سجل العمليات</h2>
+  <p>سجل إداري لمتابعة العمليات التي تتم داخل النظام، مع اسم المستخدم والتاريخ والوقت والتفاصيل.</p>
+  <div class="grid">
+    <label>بحث
+      <input id="auditSearch" placeholder="اسم المستخدم أو العملية أو التفاصيل">
+    </label>
+  </div>
+  <button onclick="loadAuditLogs()">تحديث السجل</button>
+  <div style="overflow:auto;margin-top:12px;">
+    <table>
+      <thead><tr><th>التاريخ والوقت</th><th>المستخدم</th><th>العملية</th><th>النوع</th><th>الرقم</th><th>التفاصيل</th></tr></thead>
+      <tbody id="auditRows"></tbody>
+    </table>
+  </div>
+</section>
+
+<section id="changePasswordPanel" class="card" style="margin-top:18px;">
+  <h2>تغيير كلمة المرور</h2>
+  <div class="grid">
+    <label>كلمة المرور الحالية<input id="oldPass" type="password"></label>
+    <label>كلمة المرور الجديدة<input id="newPass" type="password" minlength="8"></label>
+  </div>
+  <button onclick="changeMyPassword()">تغيير كلمة المرور</button>
+  <div id="passMsg"></div>
+</section>
+
+<section id="adminDashboardPanel" class="card" style="margin-top:18px;">
+  <h2>لوحة المدير المتقدمة</h2>
+  <div class="grid">
+    <div class="stat"><b id="admUsers">0</b><span>إجمالي الموظفين</span></div>
+    <div class="stat"><b id="admActiveUsers">0</b><span>الحسابات المفعلة</span></div>
+    <div class="stat"><b id="admLandings">0</b><span>إجمالي الإنزالات</span></div>
+    <div class="stat"><b id="admPending">0</b><span>قيد المراجعة</span></div>
+    <div class="stat"><b id="admApproved">0</b><span>معتمد</span></div>
+    <div class="stat"><b id="admDelegations">0</b><span>تفويضات نشطة</span></div>
+  </div>
+</section>
+
+<section id="accountManagementPanel" class="card" style="margin-top:18px;">
+  <h2>إدارة حسابات المفتشين</h2>
+  <p>يمكن للمدير تفعيل أو تعطيل الحسابات وإعادة تعيين كلمة المرور عند الحاجة.</p>
+  <div style="overflow:auto;">
+    <table>
+      <thead><tr><th>المستخدم</th><th>الصلاحية</th><th>الحالة</th><th>الإجراءات</th></tr></thead>
+      <tbody id="accountRows"></tbody>
+    </table>
+  </div>
+</section>
+<script>if ("serviceWorker" in navigator) { window.addEventListener("load", () => navigator.serviceWorker.register("/service-worker.js").catch(err => console.warn("تعذر تسجيل عامل التطبيق", err))); }</script>
+</body></html>`);w.document.close()}
+function setStatus(id,status){H('/api/landings/'+id+'/status',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({status})}).then(r=>r.json()).then(x=>{if(!x.ok)alert(x.error)})}
+function signLanding(id,name){H('/api/landings/'+id+'/sign',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({inspector_name:name,signature_text:'تم الاعتماد إلكترونيًا'})}).then(r=>r.json()).then(x=>{if(!x.ok)alert(x.error);else loadRecords()})}
+function addShip(){H('/api/ships',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ship_no:sn.value,ship_name:sname.value,owner_name:owner.value,license_no:license.value,notes:snotes.value})}).then(r=>r.json()).then(x=>{if(!x.ok)return alert(x.error);sn.value=sname.value=owner.value=license.value=snotes.value='';loadShips()})}
+function loadShips(){H('/api/ships').then(r=>r.json()).then(x=>shipsBox.innerHTML='<table><tr><th>رقم السفينة</th><th>اسم السفينة</th><th>المالك</th><th>الترخيص</th></tr>'+x.map(a=>`<tr><td>${a.ship_no}</td><td>${a.ship_name}</td><td>${a.owner_name||''}</td><td>${a.license_no||''}</td></tr>`).join('')+'</table>')}
+function deleteLanding(id){if(!confirm('هل أنت متأكد من حذف هذا المحضر؟'))return;H('/api/landings/'+id+'/delete',{method:'POST'}).then(r=>r.json()).then(x=>{if(!x.ok)return alert(x.error);loadRecords();loadHome()})}
+function backup(){H('/api/backup').then(r=>{if(!r.ok)throw new Error('فشل النسخ الاحتياطي');return r.blob()}).then(b=>{let a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='نسخة_احتياطية_لنظام_الإنزال.db';a.click()}).catch(e=>alert(e.message))}
+function loadReport(){
+let p=new URLSearchParams({from:rf.value,to:rt.value});
+H('/api/landings?'+p).then(r=>r.json()).then(rows=>{
+let species={}, total=0;
+rows.forEach(x=>{total+=Number(x.total_qty||0); x.fish.forEach(f=>{if(!rs.value || f.fish_name.includes(rs.value)) species[f.fish_name]=(species[f.fish_name]||0)+Number(f.quantity||0)})});
+let arr=Object.entries(species).sort((a,b)=>b[1]-a[1]);
+reportBox.innerHTML=`<div class="grid"><div class="card report">عدد المحاضر: <b>${rows.length}</b></div><div class="card report">إجمالي الكمية: <b>${total.toFixed(2)} كجم</b></div><div class="card report">عدد الأنواع: <b>${arr.length}</b></div></div><h3>الكميات حسب نوع السمك</h3><table><tr><th>نوع السمك</th><th>الإجمالي (كجم)</th></tr>${arr.map(a=>`<tr><td>${a[0]}</td><td>${a[1].toFixed(2)}</td></tr>`).join('')}</table><h3>المحاضر ضمن الفترة</h3><table><tr><th>رقم المحضر</th><th>التاريخ</th><th>السفينة</th><th>الكمية</th></tr>${rows.map(x=>`<tr><td>${x.landing_no}</td><td>${x.landing_date||''}</td><td>${x.ship_name||''}</td><td>${Number(x.total_qty||0).toFixed(2)}</td></tr>`).join('')}</table>`
+})
+}
+function addUser(){H('/api/users',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:nu.value,password:np.value,role:nr.value})}).then(r=>r.json()).then(x=>{if(!x.ok)return alert(x.error);nu.value=np.value='';loadUsers()})}
+function loadUsers(){H('/api/users').then(r=>r.json()).then(x=>users.innerHTML='<table><tr><th>اسم المستخدم</th><th>الصلاحية</th></tr>'+x.map(u=>`<tr><td>${u.username}</td><td>${u.role==='admin'?'مدير':u.role==='inspector'?'مفتش':'مشاهد'}</td></tr>`).join('')+'</table>')}
+
+async function loadDelegationPanel(){
+  const sel=document.getElementById('delegateUser');
+  if(!sel) return;
+  const users=await api('/api/users');
+  sel.innerHTML='';
+  (users||[]).filter(x=>x.role==='inspector').forEach(x=>{
+    const o=document.createElement('option'); o.value=x.username; o.textContent=x.username; sel.appendChild(o);
+  });
+  const rows=await api('/api/delegations');
+  const tb=document.getElementById('delegationRows');
+  tb.innerHTML='';
+  (rows||[]).forEach(d=>{
+    const active=d.active ? 'مفعل' : 'منتهي/ملغى';
+    tb.innerHTML += `<tr><td>${esc(d.delegate_username)}</td><td>${esc(d.start_at)}</td><td>${esc(d.end_at)}</td><td>${active}</td><td>${d.active?`<button onclick="revokeDelegation(${d.id})">إلغاء</button>`:''}</td></tr>`;
+  });
+}
+async function addDelegation(){
+  const username=document.getElementById('delegateUser').value;
+  const start_at=document.getElementById('delegateStart').value;
+  const end_at=document.getElementById('delegateEnd').value;
+  const msg=document.getElementById('delegationMsg');
+  const r=await api('/api/delegations',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,start_at,end_at})});
+  msg.textContent=r.error||'تم منح التفويض بنجاح';
+  await loadDelegationPanel(); loadAuditLogs(); loadAdminSummary(); loadAccountManagement();
+}
+async function revokeDelegation(id){
+  await api('/api/delegations/'+id+'/revoke',{method:'POST'});
+  await loadDelegationPanel(); loadAuditLogs(); loadAdminSummary(); loadAccountManagement();
+}
+
+
+async function loadAuditLogs(){
+  const q=(document.getElementById('auditSearch')||{}).value||'';
+  const rows=await api('/api/audit-logs?q='+encodeURIComponent(q));
+  const tb=document.getElementById('auditRows');
+  if(!tb) return;
+  tb.innerHTML='';
+  (rows||[]).forEach(x=>{
+    tb.innerHTML += `<tr>
+      <td>${esc(x.created_at||'')}</td>
+      <td>${esc(x.username||'')}</td>
+      <td>${esc(x.action||'')}</td>
+      <td>${esc(x.target_type||'')}</td>
+      <td>${esc(String(x.target_id||''))}</td>
+      <td>${esc(x.details||'')}</td>
+    </tr>`;
+  });
+}
+
+async function changeMyPassword(){
+  const old_password=document.getElementById('oldPass').value;
+  const new_password=document.getElementById('newPass').value;
+  const r=await api('/api/change-password',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({old_password,new_password})});
+  document.getElementById('passMsg').textContent=r.error||'تم تغيير كلمة المرور بنجاح';
+}
+
+async function loadAdminSummary(){
+  const r=await api('/api/admin/summary');
+  if(!r || r.error) return;
+  const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v};
+  set('admUsers',r.total_users); set('admActiveUsers',r.active_users);
+  set('admLandings',r.total_landings); set('admPending',r.pending);
+  set('admApproved',r.approved); set('admDelegations',r.active_delegations);
+}
+async function loadAccountManagement(){
+  const rows=await api('/api/users');
+  const tb=document.getElementById('accountRows'); if(!tb)return;
+  tb.innerHTML='';
+  (rows||[]).forEach(x=>{
+    const active=(x.active===undefined || x.active===1);
+    const role=x.role==='admin'?'مدير':(x.role==='inspector'?'مفتش':'مشاهد');
+    tb.innerHTML += `<tr><td>${esc(x.username||'')}</td><td>${role}</td><td>${active?'مفعل':'معطل'}</td>
+      <td><button onclick="toggleAccount(${x.id})">${active?'تعطيل':'تفعيل'}</button>
+      <button onclick="resetAccountPassword(${x.id},'${esc(x.username||'')}')">إعادة كلمة المرور</button></td></tr>`;
+  });
+}
+async function toggleAccount(id){
+  const r=await api('/api/users/'+id+'/toggle',{method:'POST'});
+  if(r.error) alert(r.error);
+  await loadAccountManagement(); await loadAdminSummary();
+}
+async function resetAccountPassword(id,username){
+  const p=prompt('أدخل كلمة المرور الجديدة للمستخدم '+username+' (8 أحرف على الأقل):');
+  if(!p)return;
+  const r=await api('/api/users/'+id+'/reset-password',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({new_password:p})});
+  alert(r.error||'تم تغيير كلمة المرور بنجاح');
+}
+</script>
+<section id="delegationPanel" class="card" style="margin-top:18px;">
+  <h2>تفويض صلاحية المدير للمفتشين</h2>
+  <p>يمكن للمدير اختيار مفتش ليحل محله خلال فترة الراحة أو الغياب. عند انتهاء الوقت تعود صلاحية المفتش تلقائياً إلى صلاحية مفتش.</p>
+  <div class="grid">
+    <label>المفتش
+      <select id="delegateUser"></select>
+    </label>
+    <label>بداية التفويض
+      <input id="delegateStart" type="datetime-local">
+    </label>
+    <label>نهاية التفويض
+      <input id="delegateEnd" type="datetime-local">
+    </label>
+  </div>
+  <button onclick="addDelegation()">تفويض الصلاحية</button>
+  <div id="delegationMsg"></div>
+  <div style="overflow:auto;margin-top:12px;">
+    <table>
+      <thead><tr><th>المفتش</th><th>من</th><th>إلى</th><th>الحالة</th><th>إجراء</th></tr></thead>
+      <tbody id="delegationRows"></tbody>
+    </table>
+  </div>
+</section>
+
+
+<section id="auditPanel" class="card" style="margin-top:18px;">
+  <h2>سجل العمليات</h2>
+  <p>سجل إداري لمتابعة العمليات التي تتم داخل النظام، مع اسم المستخدم والتاريخ والوقت والتفاصيل.</p>
+  <div class="grid">
+    <label>بحث
+      <input id="auditSearch" placeholder="اسم المستخدم أو العملية أو التفاصيل">
+    </label>
+  </div>
+  <button onclick="loadAuditLogs()">تحديث السجل</button>
+  <div style="overflow:auto;margin-top:12px;">
+    <table>
+      <thead><tr><th>التاريخ والوقت</th><th>المستخدم</th><th>العملية</th><th>النوع</th><th>الرقم</th><th>التفاصيل</th></tr></thead>
+      <tbody id="auditRows"></tbody>
+    </table>
+  </div>
+</section>
+
+<section id="changePasswordPanel" class="card" style="margin-top:18px;">
+  <h2>تغيير كلمة المرور</h2>
+  <div class="grid">
+    <label>كلمة المرور الحالية<input id="oldPass" type="password"></label>
+    <label>كلمة المرور الجديدة<input id="newPass" type="password" minlength="8"></label>
+  </div>
+  <button onclick="changeMyPassword()">تغيير كلمة المرور</button>
+  <div id="passMsg"></div>
+</section>
+
+<section id="adminDashboardPanel" class="card" style="margin-top:18px;">
+  <h2>لوحة المدير المتقدمة</h2>
+  <div class="grid">
+    <div class="stat"><b id="admUsers">0</b><span>إجمالي الموظفين</span></div>
+    <div class="stat"><b id="admActiveUsers">0</b><span>الحسابات المفعلة</span></div>
+    <div class="stat"><b id="admLandings">0</b><span>إجمالي الإنزالات</span></div>
+    <div class="stat"><b id="admPending">0</b><span>قيد المراجعة</span></div>
+    <div class="stat"><b id="admApproved">0</b><span>معتمد</span></div>
+    <div class="stat"><b id="admDelegations">0</b><span>تفويضات نشطة</span></div>
+  </div>
+</section>
+
+<section id="accountManagementPanel" class="card" style="margin-top:18px;">
+  <h2>إدارة حسابات المفتشين</h2>
+  <p>يمكن للمدير تفعيل أو تعطيل الحسابات وإعادة تعيين كلمة المرور عند الحاجة.</p>
+  <div style="overflow:auto;">
+    <table>
+      <thead><tr><th>المستخدم</th><th>الصلاحية</th><th>الحالة</th><th>الإجراءات</th></tr></thead>
+      <tbody id="accountRows"></tbody>
+    </table>
+  </div>
+</section>
+</body></html>
